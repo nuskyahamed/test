@@ -1,0 +1,108 @@
+server- 192.168.157.226
+=========
+sudo apt-get install apache2
+• Move into, /var/www
+• Create a simple html file. sudo vi test.html
+
+Try to ping www.bind9test.lab and observe
+ping www.bind9test.lab
+
+• Edit host’s file
+sudo vim /etc/hosts
+Update as
+192.168.157.226 ip-192-168-157-226.bind9test.lab		ip-192.168.157.226	
+
+Install utilities
+sudo apt-get install bind9 bind9utils
+
+• Configure forwarders
+• Move into /etc/bind
+sudo vim named.conf.options
+forwarders{
+	   192.168.218.2;  //default gway
+	   8.8.8.8;
+
+};
+
+• Configure zone information
+sudo vim named.conf.local
+
+zone "bind9test.lab"{
+        type master;
+        file "/etc/bind/zones/db.bind9test.lab";
+};
+
+zone "157.168.192.in-addr.arpa"{
+        type master;
+        file "/etc/bind/zones/db.192";
+};
+
+• Move into, /etc/bind
+• sudo mkdir zones
+	cd zones
+• Copy the default skeleton file into zones directory
+sudo cp ../db.local db.bind9test.lab
+
+• Edit the copied file
+sudo vim db.bind9test.lab
+
+SOA		ip-192-168-157-226.bind9test.lab admin.bind9test.lab.(
+						3		:serial
+
+bind9test.lab.           IN      NS      ip-192-168-157-226.bind9test.lab.
+bind9test.lab.           IN      A       192.168.157.226
+ip-192-168-157-226       IN      A       192.168.157.226
+ip-192-168-197-130       IN      A       192.168.197.130
+www                      IN      A       192.168.157.226
+
+• Create reverse zone file
+sudo cp ../db.127 db.192
+sudo vim db.192
+
+			ip-192-168-157-226.bind9test.lab admin.bind9test.lab.
+
+				3		:serial
+
+     		 IN      NS      ip-192-168-157.226.
+226             IN      PTR     ip-192-168-157.226.bind9test.lab.
+130             IN      PTR     ip-192-168-197.130.bind9test.lab.
+226             IN      PTR     www.bind9test.lab.
+
+
+• Check configuration validity
+named-checkzone bind9test.lab /etc/bind/zones/db.bind9test.lab
+named-checkzone bind9test.lab /etc/bind/zones/db.192
+
+• Edit local resolve file for local DNS entries
+/etc$ vim resolv.conf    to make it editable mode press esc key and type :q! to make the 
+file to editable mode. Then
+sudo vim resolv.conf to make change on it
+
+nameserver 192.168.157.226
+nameserver 192.168.157.2
+search	 bind9test.lab
+domain	 bind9test.lab
+
+/etc$ cd init.d/
+
+• Restart bind servers
+sudo systemctl restart bind9.service
+
+• Do a nslookup and observe the output
+nslookup bind9test.lab
+nslookup 192.168.218.129
+
+CLIENT
+=======
+ping 192.168.157.226
+
+• Edit “resolv.conf” file
+/etc$ Sudo vim resolv.conf
+
+nameserver 192.168.157.226
+nameserver 192.168.157.2
+search	 bind9test.lab
+domain	 bind9test.lab
+
+• Verify the connection
+ping bind9test.lab
