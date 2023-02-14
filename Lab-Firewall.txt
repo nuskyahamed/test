@@ -1,0 +1,53 @@
+ASA
+
+ciscoasa(config)#interface vlan 1
+ciscoasa(config-if)#no ip address
+ciscoasa(config)#no dhcpd address 192.168.1.5-192.168.1.36 inside
+
+ciscoasa(config)#interface vlan 1
+ciscoasa(config-if)#ip address 172.16.1.1 255.255.255.0
+ciscoasa(config-if)#no shutdown
+ciscoasa(config-if)#nameif inside 
+ciscoasa(config-if)#security-level 100
+
+ciscoasa(config)#interface ethernet 0/1
+ciscoasa(config-if)#switchport access vlan 1
+
+ciscoasa(config)#interface vlan 2
+ciscoasa(config-if)#ip address 203.1.1.2 255.255.255.0
+ciscoasa(config-if)#no shutdown 
+ciscoasa(config-if)#nameif outside
+ciscoasa(config-if)#security-level 0
+
+ciscoasa(config)#interface ethernet 0/0
+ciscoasa(config-if)#switchport access vlan 2
+
+ciscoasa(config)#dhcpd address 172.16.1.5-172.16.1.6 inside 
+ciscoasa(config)#dhcpd dns 8.8.8.8 interface inside
+
+ciscoasa(config)#route outside 0.0.0.0 0.0.0.0 203.1.1.1
+
+ISP(config)#router ospf 1
+ISP(config-router)#network 203.1.1.0 0.0.0.255 area 0
+ISP(config-router)#network 8.8.8.0 0.0.0.255 area 0
+
+ciscoasa(config)#object network LAN
+ciscoasa(config-network-object)#subnet 172.16.1.0 255.255.255.0
+ciscoasa(config-network-object)#nat (inside,outside) dynamic interface
+
+ciscoasa(config)#access-list inside_to_internet extended permit tcp any any 
+ciscoasa(config)#access-list inside_to_internet extended permit icmp any any
+ciscoasa(config)#access-group inside_to_internet in interface outside
+
+Router
+
+ISP(config)#interface gigabitEthernet 0/0
+ISP(config-if)#ip address 203.1.1.1 255.255.255.0
+ISP(config-if)#no shutdown
+
+ISP(config)#interface gigabitEthernet 0/1
+ISP(config-if)#ip address 8.8.8.1 255.255.255.0
+ISP(config-if)#no shutdown
+
+
+

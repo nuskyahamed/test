@@ -1,0 +1,35 @@
+Switch 
+
+Switch(config)#hostname SW2
+
+SW2(config)#interface vlan 1
+SW2(config-if)#ip address 192.168.0.100 255.255.255.0
+SW2(config-if)#no shutdown 
+
+SW2(config)#enable password SEUSL
+SW2(config)#enable secret FOT
+
+SW2(config)#username teacher secret teacher
+
+SW2(config)#ip domain-name seusl.lk
+
+SW2(config)#crypto key generate rsa
+
+SW2(config)#line vty 0 4
+SW2(config-line)#transport input ssh
+SW2(config-line)#login local
+
+SW2(config)#aaa new-model 
+SW2(config)#aaa authentication login default local
+
+SW2(config)#aaa authentication login FREE-LOGIN none
+
+SW2(config)#line console 0
+SW2(config-line)#login authentication FREE-LOGIN
+
+SW2(config)#tacacs-server host 192.168.0.101 key ciscoS
+
+SW2(config)#aaa authentication login TAC-LOGIN group tacacs+ local
+
+SW2(config)#line vty 0 4
+SW2(config-line)#login authentication TAC-LOGIN
