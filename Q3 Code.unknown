@@ -1,0 +1,60 @@
+a. Configure enable password and enable secret on the switch and router. Make sure no password information is in clear text, use any command to encrypt the enable password. (Record the screenshot of encrypted enable password from show run command)
+
+Router1 
+
+Router1(config)#enable password binura
+Router1(config)#enable secret yeshan
+Router1(config)#service password-encryption
+
+switch0 
+
+switch0(config)#enable password binura
+switch0(config)#enable secret yeshan
+switch0(config)#service password-encryption
+
+b. Configure a local user in the switch for authentication. Configure AAA authentication for the console login to use the local database. Verify the login authentication from the laptop which is connected to the console port of the switch. (Record the screenshots of your configurations)
+
+switch0(config)#username binura secret yeshan
+switch0(config)#aaa new-model
+switch0(config)#aaa authentication login default local
+
+switch0(config)#line console 0
+switch0(config-line)#login authentication default
+
+c. Configure line vty to use local database using AAA authentication on the switch. Enable only SSH as a connection method for line VTY. Verify the VTY login from PC (Record the screenshots of your configurations)
+
+switch0(config)#ip domain-name cisco.com
+switch0(config)#crypto key generate rsa
+switch0(config)#aaa authentication login SSH-LOGIN local
+
+switch0(config)#line vty 0 4
+switch0(config-line)#login authentication SSH-LOGIN
+switch0(config-line)#transport input ssh
+
+switch0(config)#interface vlan 1 
+switch0(config-if)#ip address 192.168.0.10 255.255.255.0
+
+d. Configure TACACS server based AAA authentication for VTY lines on the router. You may follow the bellow:
+
+a. Enable AAA services and select TACACS in the server. You may need to specify other required parameters on the server such as client name, Client IP address and key etc...
+b. Configure user accounts in the TACACS server
+c. Create a local user account on the router to use as a backup AAA
+authentication
+d. Configure AAA authentication with TACACS server and local account as a
+backup
+e. Apply the authentication to the line VTY
+
+Router1(config)#username binura secret yeshan
+Router1(config)#tacacs-server host 192.168.2.2
+Router1(config)#tacacs-server key xyz
+Router1(config)#aaa new-model 
+Router1(config)#aaa authentication login default group tacacs+ local
+Router1(config)#line console 0
+Router1(config-line)#login authentication default 
+
+Router1(config)#ip domain-name cisco.com
+Router1(config)#crypto key generate rsa
+
+Router1(config)#line vty 0 4
+Router1(config-line)#login authentication default 
+Router1(config-line)#transport input ssh 

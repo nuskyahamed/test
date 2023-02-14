@@ -1,0 +1,24 @@
+b) Configure port security on the switch port Fa0/1 with the following setting
+• Static MAC address entry for MAC address 000C.CFAB.00AA
+• Violation action shutdown
+Verify the port security restriction is working properly by testing the connectivity between PC1 and PC2 and using show port security command (Record the screenshots of both outputs).
+Change the static MAC address entry for port security on Fa 0/1 to MAC address of PC1, and make sure connection is re-established
+
+Switch(config)#interface fastEthernet 0/1
+Switch(config-if)#switchport mode access 
+Switch(config-if)#switchport port-security 
+Switch(config-if)#switchport port-security mac-address 0040.0BB2.D640
+Switch(config-if)#switchport port-security violation shutdown
+
+c) Configure port security on the switch port Fa0/1 with the below settings:
+• Sticky MAC address learning
+• Violation action restrict
+• Allowed MAC addresses: 2 •
+Test the connectivity of PC1 from PC2 and PC3. Verify the MAC addresses of PC2 and PC3 are learned as sticky MAC address for port security (Record the evidence)
+
+Switch(config)#interface fastEthernet 0/1
+Switch(config-if)#switchport mode access 
+Switch(config-if)#switchport port-security 
+Switch(config-if)#switchport port-security mac-address sticky 
+Switch(config-if)#switchport port-security maximum 2
+Switch(config-if)#switchport port-security violation restrict

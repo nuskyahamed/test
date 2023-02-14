@@ -1,0 +1,62 @@
+Configure the default gateway addresses 192.168.10.1 and 192.168.20.1 in the router
+======
+int g0/0
+ip address 192.168.10.1 255.255.255.0
+no shut
+
+int g0/1
+ip address 192.168.20.1 255.255.255.0
+no shut
+
+a. Configure a local user and set enable password and enable secret on the switch and router. 
+Make sure no password information is in clear text. 
+Multi Layer Switch
+====
+enable password nusky
+service password-encryption
+enable secret ahamed
+exit
+
+Router
+====
+enable password nusky
+service password-encryption
+enable secret ahamed
+exit
+
+configure local user in S/W & R
+===
+username ACER password TUFF
+line vty 0 15
+login
+login local
+
+
+Configure AAA authentication for the console login to use the local user. 
+Verify your configurations on the switch. 
+====
+aaa new-model
+aaa authentication login default local
+line console 0
+login authentication default
+end
+
+Enable only SSH as a connection method for line VTY. s/w & R
+====
+ip domain-name ceb.lk
+crypto key generate rsa
+aaa authentication login ssh-login local
+line vty 0 -15
+login authentication ssh-login
+transport input ssh
+end
+
+Configure RADIUS server based AAA authentication for VTY lines on the router
+===
+clientName=routerhostname     clientip=router interface ip to server
+secret=xyz				servertype=Radius
+UN=admin					PW=admin
+
+Verify the AAA configuration by establishing a connection to the router from the PC
+===
+in pc CMD= ssh -l admin 192.168.20.1
